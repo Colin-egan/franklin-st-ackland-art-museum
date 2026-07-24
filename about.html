@@ -1,12 +1,13 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>About · Ackland Art Museum</title>
-<meta name="description" content="Art for everyone on Franklin Street — Ackland Art Museum on Franklin Street, Chapel Hill.">
-<link rel="stylesheet" href="styles.css"></head><body>
+<meta content="Art for everyone on Franklin Street — Ackland Art Museum on Franklin Street, Chapel Hill." name="description"/>
+<link href="styles.css" rel="stylesheet"/></head><body>
 <header class="nav"><div class="container nav-inner">
-<a href="index.html" class="brand">Ackland Art Museum</a>
-<nav><ul class="nav-links"><li><a href="index.html" class="">Home</a></li><li><a href="menu.html" class="">Exhibitions</a></li><li><a href="about.html" class="active">About</a></li><li><a href="contact.html" class="">Contact</a></li></ul></nav></div></header>
-<section class="hero" style="padding:80px 0"><div class="container">
+<a class="brand" href="index.html">Ackland Art Museum</a>
+<nav><ul class="nav-links"><li><a class="" href="index.html">Home</a></li><li><a class="" href="menu.html">Exhibitions</a></li><li><a class="active" href="about.html">About</a></li><li><a class="" href="contact.html">Contact</a></li></ul></nav></div></header>
+<section class="hero has-photo" style="padding:80px 0;--hero-img:url('images/img0.jpg')"><div class="container">
 <h1>About Us</h1><p>Art for everyone on Franklin Street</p></div></section>
 <section class="section"><div class="container split">
 <div><h2>Our Story</h2><p style="color:var(--muted);font-size:1.1rem">The Ackland Art Museum houses a collection of more than 20,000 works spanning cultures and centuries. From European masterworks to contemporary installations and Asian art, admission is always free — inviting the whole community to explore, learn, and be inspired.</p></div>
@@ -21,8 +22,43 @@
 <a class="btn" href="menu.html" style="margin-top:24px">Explore Exhibitions</a></div></section>
 <footer><div class="container">
 <div class="brand">Ackland Art Museum</div>
-<p>101 S Columbia St, Chapel Hill, NC 27514 &nbsp;·&nbsp; (919) 966-5736</p>
+<p>101 S Columbia St, Chapel Hill, NC 27514  ·  (919) 966-5736</p>
 <p style="margin-top:6px">Wed–Sun 10:00am – 5:00pm</p>
-<p style="margin-top:16px">&copy; 2026 Ackland Art Museum · Franklin Street, Chapel Hill, NC · <a href="contact.html">Contact</a></p>
+<p style="margin-top:16px">© 2026 Ackland Art Museum · Franklin Street, Chapel Hill, NC · <a href="contact.html">Contact</a></p>
 </div></footer>
-</body></html>
+
+<div class="modal-bg" id="tickets"><div class="modal" id="tickets-body">
+<span class="close" onclick="closeModal('tickets')">×</span>
+<h3>Plan Your Visit</h3><p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">General admission is always free — reserve a spot for guided tours &amp; events.</p>
+<div class="field"><label>Name</label><input required=""/></div>
+<div class="field"><label>Visit date</label><input type="date"/></div>
+<div class="field"><label>Experience</label><select><option>General Admission (Free)</option><option>Guided Tour</option><option>Art After Dark</option><option>Family Workshop</option></select></div>
+<div class="field"><label>Guests</label><select><option>1</option><option>2</option><option>3</option><option>4+</option></select></div>
+<button class="btn" onclick="submitForm('tickets-body','Visit reserved! 🎉')" style="width:100%">Reserve Visit</button>
+<p class="note">Demo form. Connect Eventbrite or a ticketing provider to sell paid tickets.</p>
+</div></div>
+<script>
+const MENU = [{"name": "Permanent Collection", "price": "Free"}, {"name": "Contemporary Gallery", "price": "Free"}, {"name": "Asian Art Wing", "price": "Free"}, {"name": "Guided Tours", "price": "Free"}, {"name": "Art After Dark", "price": "Free"}, {"name": "Family Workshops", "price": "Free"}];
+const CART = {};
+function money(s){const n=parseFloat(String(s).replace(/[^0-9.]/g,''));return isNaN(n)?0:n;}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function addToCart(name){CART[name]=(CART[name]||0)+1;renderCart();openModal('order');}
+function chg(name,d){CART[name]=(CART[name]||0)+d;if(CART[name]<=0)delete CART[name];renderCart();}
+function renderCart(){
+  const el=document.getElementById('cart-lines');if(!el)return;
+  let total=0,html='';const keys=Object.keys(CART);
+  if(!keys.length){el.innerHTML='<p style=\'color:#999\'>Your cart is empty. Add items from the menu.</p>';document.getElementById('cart-total').textContent='';updateFab();return;}
+  keys.forEach(k=>{const it=MENU.find(m=>m.name===k)||{price:'0'};const line=money(it.price)*CART[k];total+=line;
+    html+=`<div class='cart-line'><span>${k}</span><span class='qty'><button onclick=\"chg('${k.replace(/'/g,"\\'")}',-1)\">−</button>${CART[k]}<button onclick=\"chg('${k.replace(/'/g,"\\'")}',1)\">+</button></span></div>`;});
+  el.innerHTML=html;document.getElementById('cart-total').textContent='Total: $'+total.toFixed(2);updateFab();
+}
+function updateFab(){const f=document.getElementById('cartFab');if(!f)return;const c=Object.values(CART).reduce((a,b)=>a+b,0);f.style.display=c?'block':'none';f.textContent='🛒 View Cart ('+c+')';}
+function checkout(){
+  // GO-LIVE HOOK: replace with your Stripe Payment Link / Square Online / Toast URL
+  const c=Object.values(CART).reduce((a,b)=>a+b,0);
+  if(!c){alert('Add some items first!');return;}
+  document.getElementById('order-body').innerHTML='<h3>Order received! 🎉</h3><p style=\'margin-top:10px;color:var(--muted)\'>This demo confirms your order. Connect a Stripe Payment Link or Toast/Square account to accept live payments.</p>';
+}
+function submitForm(id,msg){document.getElementById(id).innerHTML='<h3>'+msg+'</h3><p style=\'margin-top:10px;color:var(--muted)\'>This demo confirms your request. Connect OpenTable/Resy (reservations) or a booking engine to go live.</p>';}
+</script></body></html>
